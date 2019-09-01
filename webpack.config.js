@@ -9,7 +9,11 @@ module.exports = {
         use: {
           loader: "babel-loader"
         }
-      } 
+      }, { // support requiring css files, required for react-flexbox-grid
+        test: /\.css$/,
+        loader: 'style-loader!css-loader',
+        include: /flexboxgrid/
+      }
     ]
   },
   plugins: [

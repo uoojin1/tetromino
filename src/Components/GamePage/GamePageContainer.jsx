@@ -20,15 +20,23 @@ const Title = styled.div`
 
 const GameBoardWrapper = styled.div`
   border: 1px solid grey;
-  width: 350px;
-  height: 500px;
+  width: 240px;
+  height: 400px;
 `
 
 const Button = styled.div`
   border: 1px solid grey;
-  height: 45px;
-  width: 150px;
-  margin: 1rem;
+  border-radius: 4px;
+  display: flex;
+  height: 35px;
+  width: 100px;
+  margin: 1rem auto;
+`
+
+const ButtonText = styled.div`
+  width: fit-content;
+  height: fit-content;
+  margin: auto auto;
 `
 
 const GamePageContainer = () => {
@@ -36,7 +44,7 @@ const GamePageContainer = () => {
   const [canvasHandler, setCanvasHandler] = useState(null)
   const { gameState, setGameState } = useContext(GameStateContext)
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (e) => {
     if (!canvasHandler) return
     if (gameState === "ready") {
       canvasHandler.gameStart()
@@ -49,7 +57,8 @@ const GamePageContainer = () => {
   }
 
   useEffect(() => {
-    if (gameboard && gameboard.current !== null) {
+    if (canvasHandler === null && gameboard && gameboard.current !== null) {
+      console.log('SET CANVAS HANDLER')
       setCanvasHandler(new CanvasHandler(gameboard.current))
     }
   }, [gameboard.current])
@@ -58,9 +67,11 @@ const GamePageContainer = () => {
     <GamePageWrapper>
       <Title>Tetromino</Title>
       <GameBoardWrapper>
-        <canvas ref={gameboard} id="gameboard" width="350px" height="500px"></canvas>
+        <canvas ref={gameboard} id="gameboard" width="240" height="400"></canvas>
       </GameBoardWrapper>
-      <Button onClick={handleButtonClick}>{gameState}</Button>
+      <Button onClick={handleButtonClick}>
+        <ButtonText>{gameState}</ButtonText>
+      </Button>
     </GamePageWrapper>
   )
 }

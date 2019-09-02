@@ -2,7 +2,7 @@ export default class CanvasHandler {
   constructor(canvas) {
     this.context = canvas.getContext("2d")
     this.canvas = canvas
-    this.context.scale(5, 5) // scale all by 20 times
+    this.context.scale(20, 20)
     this.arena = this._createMatrix(12, 20)
     this.player = {
       pos: {
@@ -16,6 +16,17 @@ export default class CanvasHandler {
       ],
       score: 0
     }
+
+    this.colors = [
+      null,
+      '#4897D8',
+      '#ffdb5c',
+      '#fa6e59',
+      '#ffb43b',
+      '#89da59',
+      '#ffc2c5',
+      '#df8fff',
+    ]
 
     this.addListener()
     
@@ -31,7 +42,69 @@ export default class CanvasHandler {
     this._reqAniID = null
   }
 
+  createPiece(type) {
+    if (type === 'T'){
+      return [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 1, 0]
+      ];
+    } else if (type === 'O'){
+      return [
+        [2, 2],
+        [2, 2]
+      ];
+    } else if (type === 'L'){
+      return [
+        [0, 3, 0],
+        [0, 3, 0],
+        [0, 3, 3]
+      ];
+    } else if (type === 'J'){
+      return [
+        [0, 4, 0],
+        [0, 4, 0],
+        [4, 4, 0]
+      ];
+    } else if (type === 'I'){
+      return [
+        [0, 5, 0, 0],
+        [0, 5, 0, 0],
+        [0, 5, 0, 0],
+        [0, 5, 0, 0]
+      ];
+    } else if (type === 'S'){
+      return [
+        [0, 6, 6],
+        [6, 6, 0],
+        [0, 0, 0]
+      ];
+    } else if (type === 'Z'){
+      return [
+        [7, 7, 0],
+        [0, 7, 7],
+        [0, 0, 0]
+      ];
+    }
+  }
+
+  arenaSweep() {
+    let rowCount = 1
+    outer: for (let y = this.arena.length - 1; y > 0; --y) {
+      for (let x = 0; x < this.arena.length; ++x) {
+        if (this.arena[y][x] === 0) {
+          continue outer
+        }
+      }
+      const row = this.arena.splice(y,1)[0].fill(0)
+      this.arena.unshift(row)
+      ++y
+    }
+  }
+
   playerReset() {
+    const pieces = 'ILJOTSZ';
+    this.player.matrix = this.createPiece(pieces[pieces.length * Math.random() | 0]); // floored
     this.player.pos.y = 0
     this.player.pos.x = 5
   }
@@ -61,6 +134,8 @@ export default class CanvasHandler {
         this.playerRotate(1);
       } else if (event.key === 'z'){
         this.playerRotate(-1);
+      } else if (event.keyCode === 32){
+        this.playerFreeFall();
       }
     })
   }
@@ -69,7 +144,7 @@ export default class CanvasHandler {
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
-          this.context.fillStyle = '#353535'//colors[value];
+          this.context.fillStyle = this.colors[value];
           this.context.fillRect(x + offset.x, y + offset.y, 1, 1);
         }
       });
@@ -78,6 +153,9 @@ export default class CanvasHandler {
 
   playerMove(dir) {
     this.player.pos.x += dir;
+    if (this.collide(this.arena, this.player)){
+      this.player.pos.x -= dir;
+    }
   }
 
   rotate(matrix, dir) {
@@ -88,7 +166,7 @@ export default class CanvasHandler {
       for( let x = 0; x < matrix[y].length; ++x){
         if(dir === -1) { // clockwise
           rotated[y][x] = matrix[x][maxRow-y];
-        } else if (dir === 1) { // counter clockwise
+        } else if (dir === 1) {
           rotated[y][x] = matrix[maxCol-x][y];
         }
       }
@@ -97,7 +175,32 @@ export default class CanvasHandler {
   }
 
   playerRotate(dir) {
+    const pos = this.player.pos.x
+    let offset = 1
     this.rotate(this.player.matrix, dir);
+    while (this.collide(this.arena, this.player)){
+      this.player.pos.x += offset;
+      offset = - (offset + (offset > 0 ? 1: -1));
+      /**
+       * if offset grows too large and it doesn't make sense to move the piece that far, just keep 
+       * that position, and revert the rotation. player should be stuck here
+       */
+      if(offset > this.player.matrix[0].length) {
+        this.rotate(player.matrix, -dir);
+        this.player.pos.x = pos;
+        return;
+      }
+  }
+  }
+
+  playerFreeFall() {
+    while (!this.collide(this.arena, this.player)){
+      this.player.pos.y++;
+    }
+    this.player.pos.y--;
+    this.merge(this.arena, this.player);
+    this.playerReset();
+    this.arenaSweep()
   }
 
   _playerDrop() {
@@ -107,6 +210,7 @@ export default class CanvasHandler {
       this.player.pos.y--;
       this.merge(this.arena, this.player);
       this.playerReset()
+      this.arenaSweep()
     }
   }
 
@@ -129,7 +233,7 @@ export default class CanvasHandler {
   }
 
   _clearCanvas() {
-    this.context.fillStyle = '#f4f4f4'
+    this.context.fillStyle = '#ffffff'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
   }
 

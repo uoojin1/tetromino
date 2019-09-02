@@ -8,8 +8,8 @@ import CanvasHandler from './CanvasHandler'
 
 const GameBoardWrapper = styled.div`
   border: 1px solid grey;
-  width: 350px;
-  height: 500px;
+  width: 240px;
+  height: 400px;
 `
 
 const GameBoardContainer = () => {
@@ -30,7 +30,7 @@ const GameBoardContainer = () => {
 
   return (
     <GameBoardWrapper>
-      <canvas ref={gameboard} id="gameboard" width="350px" height="500px"></canvas>
+      <canvas ref={gameboard} id="gameboard" width="240" height="400"></canvas>
     </GameBoardWrapper>
   )
 }

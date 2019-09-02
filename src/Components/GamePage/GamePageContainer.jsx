@@ -44,7 +44,7 @@ const GamePageContainer = () => {
   const [gameHandler, setGameHandler] = useState(null)
   const { gameState, setGameState } = useContext(GameStateContext)
 
-  const handleButtonClick = (e) => {
+  const handleButtonClick = () => {
     if (!gameHandler) return
     if (gameState === "ready") {
       gameHandler.start()

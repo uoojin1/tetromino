@@ -11,11 +11,9 @@ export default class Player extends MatrixObject {
     }
     this.score = 0
 
-    // PRIVATE
     this._rotate = this._rotate.bind(this)
     this._collide = this._collide.bind(this)
 
-    // PUBLIC
     this.reset = this.reset.bind(this)
     this.move = this.move.bind(this)
     this.rotate = this.rotate.bind(this)
@@ -23,11 +21,10 @@ export default class Player extends MatrixObject {
     this.drop = this.drop.bind(this)
   }
 
-  // PRIVATE METHODS
   _collide(arena) {
     const [matrix, offset] = [this.matrix, this.pos];
-    for( let y = 0; y < matrix.length; ++y ){ // matrix rows
-      for( let x = 0; x < matrix[y].length; ++x ){ // matrix row[y]'s column length
+    for( let y = 0; y < matrix.length; ++y ){
+      for( let x = 0; x < matrix[y].length; ++x ){
         if (matrix[y][x] !== 0
             && (arena[y + offset.y] && arena[y+offset.y][x+offset.x]) !== 0) {
           return true;
@@ -42,7 +39,7 @@ export default class Player extends MatrixObject {
     let maxCol = this.matrix[0].length - 1;
     for (let y = 0; y < this.matrix.length; ++y){
       for( let x = 0; x < this.matrix[y].length; ++x){
-        if(dir === -1) { // clockwise
+        if(dir === -1) {
           rotated[y][x] = this.matrix[x][maxRow-y];
         } else if (dir === 1) {
           rotated[y][x] = this.matrix[maxCol-x][y];
@@ -52,7 +49,6 @@ export default class Player extends MatrixObject {
     this.matrix = rotated;
   }
 
-  // PUBLIC METHODS
   reset() {
     this.matrix = new Piece(AvailablePieces[AvailablePieces.length * Math.random() | 0]).matrix
     this.pos.y = 0

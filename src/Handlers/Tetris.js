@@ -5,14 +5,12 @@ import CanvasHandler from './CanvasHandler'
 class Tetris extends CanvasHandler {
   constructor(canvas) {
     super(canvas)
-    // everything about tetris
     this.player = new Player()
     this.arena = new Arena(12, 20)
     this.score = 0
     this._addListener()
   }
 
-  // PRIVATE METHODS
   _addListener() {
     document.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowLeft') {
@@ -31,12 +29,11 @@ class Tetris extends CanvasHandler {
     })
   }
 
-  // PUBLIC METHODS  
   start() {
     super.start(this.arena, this.player)
   }
   pause() {
-    super.finish() // todo
+    super.finish()
   }
   finish() {
     super.finish()

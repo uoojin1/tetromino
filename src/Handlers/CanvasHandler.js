@@ -22,19 +22,14 @@ class CanvasHandler {
       '#df8fff',
     ]
 
-    // PRIVATE
     this._clearCanvas = this._clearCanvas.bind(this)
     this._drawMatrix = this._drawMatrix.bind(this)
     this._draw = this._draw.bind(this)
     this._update = this._update.bind(this)
 
-    // PUBLIC
     this.start = this.start.bind(this)
 
-
-    // this._addListener()
   }
-  // PRIVATE METHODS
   _clearCanvas() {
     this.context.fillStyle = '#ffffff'
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
@@ -69,19 +64,15 @@ class CanvasHandler {
     this._reqAniID = requestAnimationFrame(this._update)
   }
 
-  // PUBLIC METHODS
   start(arena, player) {
-    console.log('[Canvas Handler]: game start')
     this.arena = arena
     this.player = player
     this._update()
   }
   pause() {
-    console.log('[Canvas Handler]: game pause')
     cancelAnimationFrame(this._reqAniID)
   }
   finish() {
-    console.log('[Canvas Handler]: game finish')
     cancelAnimationFrame(this._reqAniID)
   }
 }

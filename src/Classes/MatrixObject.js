@@ -6,7 +6,7 @@ class MatrixObject {
 
     this._rotate = this._rotate.bind(this)
   }
-  // PRIVATE METHODS
+  
   _createMatrix(width, height) {
     const matrix = []
     while (height--) {

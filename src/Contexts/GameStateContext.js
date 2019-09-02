@@ -11,8 +11,6 @@ export const GameStateProvider = ({ children }) => {
     gameState,
     setGameState
   }
-  console.log('game state provider', value)
-  console.log('children', children)
   return (
     <GameStateContext.Provider value={value}>
       {children}

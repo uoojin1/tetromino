@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
-import CanvasHandler from '../GamePage/BoardAndPreview/GameBoard/CanvasHandler'
 import GameStateContext from '../../Contexts/GameStateContext'
+import GameHandler from '../../Handlers/GameHandler'
 
 const GamePageWrapper = styled.div`
   height: 600;
@@ -41,25 +41,24 @@ const ButtonText = styled.div`
 
 const GamePageContainer = () => {
   const gameboard = useRef(null);
-  const [canvasHandler, setCanvasHandler] = useState(null)
+  const [gameHandler, setGameHandler] = useState(null)
   const { gameState, setGameState } = useContext(GameStateContext)
 
   const handleButtonClick = (e) => {
-    if (!canvasHandler) return
+    if (!gameHandler) return
     if (gameState === "ready") {
-      canvasHandler.gameStart()
+      gameHandler.start()
       setGameState("playing")
     }
     if (gameState === "playing") {
-      canvasHandler.gameFinish()
+      gameHandler.finish()
       setGameState("ready")
     }
   }
 
   useEffect(() => {
-    if (canvasHandler === null && gameboard && gameboard.current !== null) {
-      console.log('SET CANVAS HANDLER')
-      setCanvasHandler(new CanvasHandler(gameboard.current))
+    if (gameHandler === null && gameboard && gameboard.current !== null) {
+      setGameHandler(new GameHandler(gameboard.current))
     }
   }, [gameboard.current])
 

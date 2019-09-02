@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import GameStateContext from '../../../Contexts/GameStateContext'
 
@@ -17,7 +17,7 @@ const Button = styled.div`
 
 const FlowControlButton = () => {
   const { gameState, setGameState } = useContext(GameStateContext)
-
+  
   const handleButtonClick = () => {
     if (gameState === "ready") setGameState("playing")
     if (gameState === "playing") setGameState("ready")

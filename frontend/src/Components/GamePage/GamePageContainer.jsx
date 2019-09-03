@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react'
 import styled from 'styled-components'
-import GameStateContext from '../../Contexts/GameStateContext'
+import GameStateContext, { GameStateProvider } from '../../Contexts/GameStateContext'
 import GameHandler from '../../Handlers/GameHandler'
 
 const GamePageWrapper = styled.div`
@@ -63,15 +63,17 @@ const GamePageContainer = () => {
   }, [gameboard.current])
 
   return (
-    <GamePageWrapper>
-      <Title>Tetromino</Title>
-      <GameBoardWrapper>
-        <canvas ref={gameboard} id="gameboard" width="240" height="400"></canvas>
-      </GameBoardWrapper>
-      <Button onClick={handleButtonClick}>
-        <ButtonText>{gameState}</ButtonText>
-      </Button>
-    </GamePageWrapper>
+    <GameStateProvider>
+      <GamePageWrapper>
+        <Title>Tetromino</Title>
+        <GameBoardWrapper>
+          <canvas ref={gameboard} id="gameboard" width="240" height="400"></canvas>
+        </GameBoardWrapper>
+        <Button onClick={handleButtonClick}>
+          <ButtonText>{gameState}</ButtonText>
+        </Button>
+      </GamePageWrapper>
+    </GameStateProvider>
   )
 }
 

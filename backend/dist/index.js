@@ -15,10 +15,22 @@ console.log('listening on port 3000');
 var connections = new Map();
 var connectionID = 0;
 
+/**
+ * TODO: 
+ * 1. on new conection, update OnlinUsersList on all client
+ * 2. on close connection, update OnlineUsersList on all client
+ * 
+ * 3. just like 'connections', we need to hold 'room'
+ */
+
 Server.on('connection', function (ws) {
   var uniqueID = connectionID++;
   connections.set(uniqueID, ws);
   console.log('new online user', connections.keys());
+
+  Server.clients.forEach(function (client) {
+    client.send("new:" + JSON.stringify(connections));
+  });
 
   // received messsage
   ws.on('message', function (data) {

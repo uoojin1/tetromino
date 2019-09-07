@@ -4,53 +4,83 @@ const Server = new WebSocket.Server({ port: 3000 })
 
 console.log('listening on port 3000')
 
+// Session variables
 const connections = new Map()
 let connectionID = 0
+const rooms = new Map()
+let roomID = 0
 
-/**
- * TODO: 
- * 1. on new conection, update OnlinUsersList on all client
- * 2. on close connection, update OnlineUsersList on all client
- * 
- * 3. just like 'connections', we need to hold 'room'
- */
+const mapToJson = (map) => {
+  return JSON.stringify([...map]);
+}
+const jsonToMap = (jsonStr) => {
+  return new Map(JSON.parse(jsonStr));
+}
+
+const convertConnectionsToList = () => {
+  return [...connections.keys()]
+}
+
+const broadcast = (type, message) => {
+  Server.clients.forEach((client) => {
+    client.send(JSON.stringify(`${type}:${message}`))
+  })
+}
+
+const handleJoinRoom = (userID, roomID) => {
+  if (!rooms || !rooms.has(roomID)) {
+    console.log('joining is not a valid action')
+  }
+  const usersInThisRoom = rooms.get(roomID)
+  usersInThisRoom.push(userID)
+  rooms.set(roomID, usersInThisRoom)
+}
+
+const handleCreateRoom = (userID) => {
+  rooms.set(roomID, [userID])
+  roomID++
+  broadcast('createdRoom', mapToJson(rooms))
+}
 
 Server.on('connection', (ws) => {
   const uniqueID = connectionID++
   connections.set(uniqueID, ws)
-  console.log('new online user', connections.keys())
 
-  Server.clients.forEach((client) => {
-    client.send("new:" + JSON.stringify(connections))
-  })
+  // broadcast new connectino to every client
+  broadcast('new', JSON.stringify(convertConnectionsToList()))
 
   // received messsage
-  ws.on('message', (data) => {
-    console.log('message received', data)
-    if (data === 'getOnlineUsers') {
-      console.log('befre?', connections.keys())
-      const onlineUsers = JSON.stringify([...connections.keys()])
-      console.log('online users', onlineUsers)
-      ws.send('getOnlineUsers:' + onlineUsers)
+  ws.on('message', (msg) => {
+    const [req, body] = JSON.parse(msg).split(':')
+    console.log('got message', req, body)
+    switch (req) {
+      case 'getOnlineUsers':
+        const list = convertConnectionsToList()
+        const message = `getOnlineUsers:${JSON.stringify(list)}`
+        ws.send(JSON.stringify(message))
+        break
+      // CHAT
+      case 'chat':
+          broadcast('chat', JSON.stringify(body))
+        break
+      // ROOMS
+      case 'createRoom':
+        handleCreateRoom(uniqueID)
+        break
+      case 'joinRoom':
+        const roomID = JSON.stringify(body)
+        handleJoinRoom(uniqueID, roomID)
+        break
+      case 'exitRoom':
+        break;
+      default:
+        break;
     }
-    
-
-    // Server.clients.forEach((client) => {
-    //   // don't send me this back
-    //   // if (client !== ws && client.readyState === WebSocket.OPEN) {
-    //   //   console.log('send data to client!', data)
-    //   //   client.send(data);
-    //   // }
-    //   if (client.readyState === WebSocket.OPEN) {
-    //     console.log('send data to client!', data)
-    //     client.send(data);
-    //   }
-    // })
   })
 
   // closing connection
   ws.on('close', () => {
     connections.delete(uniqueID)
-    console.log('closing connection', connections)
+    Server.clients.forEach(client => client.send(JSON.stringify(`close:${uniqueID}`)))
   })
 })

@@ -4,34 +4,45 @@ import WebSocketConnection from '../Handlers/WebSocketConnection'
 const ConnectionContext = createContext({
   connection: null,
   connectionIsOpen: false,
-  onlineUsers: null
+  onlineUsers: null,
+  chat: []
 })
 
 export const ConnectionProvider = ({ children }) => {
   const [connection, setConnection] = useState(null)
   const [connectionIsOpen, setConnectionIsOpen] = useState(false)
   const [onlineUsers, setOnlineUsers] = useState([])
-  
-  const stateSetters = {
+  const [chat, setChat] = useState([])
+
+  const receiveChat = (messageList) => {
+    setChat(messageList)
+  }
+
+  const updateOnlineUsers = (usersList) => {
+    setOnlineUsers(usersList)
+  }
+
+  const methods = {
     setConnectionIsOpen,
-    setOnlineUsers
+    setOnlineUsers,
+    updateOnlineUsers,
+    receiveChat
   }
 
   useEffect(() => {
     if (!connection) {
-      setConnection(new WebSocketConnection(stateSetters))
+      setConnection(new WebSocketConnection(methods))
     }
     if (connectionIsOpen) {
       connection.getOnlineUsersList()
     }
   }, [connection, connectionIsOpen])
 
-  console.log('o***nline users', onlineUsers)
-
   const value = {
     connection,
     connectionIsOpen,
-    onlineUsers
+    onlineUsers,
+    chat
   }
 
   return (

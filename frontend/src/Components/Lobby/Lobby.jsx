@@ -2,6 +2,8 @@ import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import ConnectionContext from '../../Contexts/ConnectionContext'
 import OnlineUsersList from '../../Components/Lobby/OnlineUsersList'
+import Chat from './Chat'
+import RoomsSection from './RoomsSection'
 
 const LobbyWrapper = styled.div`
   width: fit-content;
@@ -22,11 +24,11 @@ const RoomList = styled.div`
   height: 70%;
 `
 
-const Chat = styled.div`
-  border: 1px solid black;
-  margin: 2% 2%;
-  height: 160px;
-`
+// const Chat = styled.div`
+//   border: 1px solid black;
+//   margin: 2% 2%;
+//   height: 160px;
+// `
 
 const OnlineUsersListWrapper = styled.div`
   border: 1px solid grey;
@@ -36,21 +38,20 @@ const OnlineUsersListWrapper = styled.div`
 `
 
 const Lobby = () => {
-  const { connection, connectionIsOpen, onlineUsers } = useContext(ConnectionContext)
-  
+  const { connection, connectionIsOpen, onlineUsers, chat } = useContext(ConnectionContext)
+
   if (!connection || !connectionIsOpen || !onlineUsers) {
     return (
       <div>Connection is not ready</div>
     )
   }
 
-  console.log('finally got the online users!', onlineUsers)
-
   return (
     <LobbyWrapper>
       <RoomListAndChatWrapper>
-        <RoomList>ROOM LIST</RoomList>
-        <Chat>CHAT</Chat>
+        {/* <RoomList>ROOM LIST</RoomList> */}
+        <RoomsSection />
+        <Chat />
       </RoomListAndChatWrapper>
       <OnlineUsersListWrapper>
         <OnlineUsersList onlineUsers={onlineUsers} />

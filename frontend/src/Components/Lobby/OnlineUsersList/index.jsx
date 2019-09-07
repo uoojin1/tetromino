@@ -22,7 +22,6 @@ const UserInfo = styled.div`
 `
 
 const OnlineUsersList = ({ onlineUsers }) => {
-  console.log('online users list !@!@#!@# ', onlineUsers)
   return (
     <UserListWrapper>
       {

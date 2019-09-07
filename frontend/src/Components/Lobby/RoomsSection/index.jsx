@@ -39,15 +39,10 @@ const RoomList = styled.div`
 
 const Rooms = () => {
   const { connection, rooms } = useContext(ConnectionContext)
-
-  console.log('rooms', rooms)
+  
   const roomList = []
 
-  rooms.forEach((value, key) => {
-    roomList.push({ id: key, value })
-  })
-
-  console.log('roomList', roomList)
+  rooms.forEach((value, key) => roomList.push({ id: key, value }))
 
   if (!connection || !connection.isConnected()) {
     return <div>creating room is not available</div>
@@ -59,6 +54,7 @@ const Rooms = () => {
 
   const handleEnterRoom = (roomID) => {
     console.log('handle enter room: roomID', roomID)
+    connection.joinRoom(roomID)
   }
 
   return (

@@ -93,6 +93,12 @@ class WebSocketConnection {
     }
   }
 
+  joinRoom(roomID) {
+    if (this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(`joinRoom:${roomID}`))
+    }
+  }
+
   sendMessage(msg) {
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(`chat:${msg}`))

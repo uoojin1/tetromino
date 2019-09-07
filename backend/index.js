@@ -27,17 +27,35 @@ const broadcast = (type, message) => {
   })
 }
 
-const handleJoinRoom = (userID, roomID) => {
+const handleJoinRoom = (userID, JSONroomID) => {
+  const roomID = Number(JSON.parse(JSONroomID))
   if (!rooms || !rooms.has(roomID)) {
     console.log('joining is not a valid action')
+    return
   }
   const usersInThisRoom = rooms.get(roomID)
-  usersInThisRoom.push(userID)
+  usersInThisRoom.add(userID)
   rooms.set(roomID, usersInThisRoom)
+  // broadcast to the people in that room
+
+  console.log('\nROOM ID: ', roomID)
+  console.log('all rooms', rooms)
+  console.log('-- users in this room --')
+  usersInThisRoom.forEach((roomMemberID) => {
+    console.log('     ---- userID ----', userID)
+    if (connections.has(roomMemberID)) {
+      console.log('we found user', userID)
+      if (roomMemberID === userID) {
+        // send back ack
+      } else {
+        // send back 'someone joined'
+      }
+    }
+  })
 }
 
 const handleCreateRoom = (userID) => {
-  rooms.set(roomID, [userID])
+  rooms.set(roomID, new Set([userID]))
   roomID++
   broadcast('createdRoom', mapToJson(rooms))
 }
@@ -69,6 +87,8 @@ Server.on('connection', (ws) => {
         handleCreateRoom(uniqueID)
         break
       case 'joinRoom':
+        console.log('JOIN ROOM received!')
+        console.log({req, body})
         const roomID = JSON.stringify(body)
         handleJoinRoom(uniqueID, roomID)
         break

@@ -37,17 +37,30 @@ var broadcast = function broadcast(type, message) {
   });
 };
 
-var handleJoinRoom = function handleJoinRoom(userID, roomID) {
+var handleJoinRoom = function handleJoinRoom(userID, JSONroomID) {
+  var roomID = Number(JSON.parse(JSONroomID));
   if (!rooms || !rooms.has(roomID)) {
     console.log('joining is not a valid action');
+    return;
   }
   var usersInThisRoom = rooms.get(roomID);
-  usersInThisRoom.push(userID);
+  usersInThisRoom.add(userID);
   rooms.set(roomID, usersInThisRoom);
+  // broadcast to the people in that room
+
+  console.log('\nROOM ID: ', roomID);
+  console.log('all rooms', rooms);
+  console.log('-- users in this room --');
+  usersInThisRoom.forEach(function (userID) {
+    console.log('     ---- userID ----', userID);
+    if (connections.has(userID)) {
+      console.log('we found user', userID);
+    }
+  });
 };
 
 var handleCreateRoom = function handleCreateRoom(userID) {
-  rooms.set(roomID, [userID]);
+  rooms.set(roomID, new Set([userID]));
   roomID++;
   broadcast('createdRoom', mapToJson(rooms));
 };
@@ -83,6 +96,8 @@ Server.on('connection', function (ws) {
         handleCreateRoom(uniqueID);
         break;
       case 'joinRoom':
+        console.log('JOIN ROOM received!');
+        console.log({ req: req, body: body });
         var _roomID = JSON.stringify(body);
         handleJoinRoom(uniqueID, _roomID);
         break;

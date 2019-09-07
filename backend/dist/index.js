@@ -32,10 +32,6 @@ var convertConnectionsToList = function convertConnectionsToList() {
 };
 
 var broadcast = function broadcast(type, message) {
-  console.log('- broadcas', type, message);
-  console.log("[stringified]", JSON.stringify(type + ':' + message));
-  console.log('server.clients', type, message);
-  // console.dir(Server.clients, {depth: 0})
   Server.clients.forEach(function (client) {
     client.send(JSON.stringify(type + ':' + message));
   });
@@ -53,8 +49,6 @@ var handleJoinRoom = function handleJoinRoom(userID, roomID) {
 var handleCreateRoom = function handleCreateRoom(userID) {
   rooms.set(roomID, [userID]);
   roomID++;
-  console.log('rooms?', rooms);
-  console.log('stringified roomz', mapToJson(rooms));
   broadcast('createdRoom', mapToJson(rooms));
 };
 
@@ -72,24 +66,24 @@ Server.on('connection', function (ws) {
         req = _JSON$parse$split2[0],
         body = _JSON$parse$split2[1];
 
-    console.log('got message', req, body);
     switch (req) {
       case 'getOnlineUsers':
         var list = convertConnectionsToList();
-        var message = 'getOnlineUsers:' + JSON.stringify(list);
-        ws.send(JSON.stringify(message));
+        ws.send(JSON.stringify('gotOnlineUsers:' + JSON.stringify(list)));
         break;
-      // CHAT
+      case 'getAvailableRooms':
+        var availableRooms = mapToJson(rooms);
+        ws.send(JSON.stringify('gotAvailableRooms:' + availableRooms));
+        break;
       case 'chat':
-        broadcast('chat', JSON.stringify(body));
+        var formattedMessage = 'userID_[' + uniqueID + ']   -->   ' + body;
+        broadcast('chatted', JSON.stringify(formattedMessage));
         break;
-      // ROOMS
       case 'createRoom':
         handleCreateRoom(uniqueID);
         break;
       case 'joinRoom':
         var _roomID = JSON.stringify(body);
-        console.log('JOIN room ID?', _roomID);
         handleJoinRoom(uniqueID, _roomID);
         break;
       case 'exitRoom':
@@ -97,18 +91,6 @@ Server.on('connection', function (ws) {
       default:
         break;
     }
-
-    // Server.clients.forEach((client) => {
-    //   // don't send me this back
-    //   // if (client !== ws && client.readyState === WebSocket.OPEN) {
-    //   //   console.log('send data to client!', data)
-    //   //   client.send(data);
-    //   // }
-    //   if (client.readyState === WebSocket.OPEN) {
-    //     console.log('send data to client!', data)
-    //     client.send(data);
-    //   }
-    // })
   });
 
   // closing connection

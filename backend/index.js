@@ -52,18 +52,19 @@ Server.on('connection', (ws) => {
   // received messsage
   ws.on('message', (msg) => {
     const [req, body] = JSON.parse(msg).split(':')
-    console.log('got message', req, body)
     switch (req) {
       case 'getOnlineUsers':
         const list = convertConnectionsToList()
-        const message = `getOnlineUsers:${JSON.stringify(list)}`
-        ws.send(JSON.stringify(message))
+        ws.send(JSON.stringify(`gotOnlineUsers:${JSON.stringify(list)}`))
         break
-      // CHAT
+      case 'getAvailableRooms':
+        const availableRooms = mapToJson(rooms)
+        ws.send(JSON.stringify(`gotAvailableRooms:${availableRooms}`))
+        break
       case 'chat':
-          broadcast('chat', JSON.stringify(body))
+        const formattedMessage = `userID_[${uniqueID}]   -->   ${body}`
+        broadcast('chatted', JSON.stringify(formattedMessage))
         break
-      // ROOMS
       case 'createRoom':
         handleCreateRoom(uniqueID)
         break

@@ -5,7 +5,8 @@ const ConnectionContext = createContext({
   connection: null,
   connectionIsOpen: false,
   onlineUsers: null,
-  chat: []
+  chat: [],
+  rooms: null
 })
 
 export const ConnectionProvider = ({ children }) => {
@@ -13,6 +14,11 @@ export const ConnectionProvider = ({ children }) => {
   const [connectionIsOpen, setConnectionIsOpen] = useState(false)
   const [onlineUsers, setOnlineUsers] = useState([])
   const [chat, setChat] = useState([])
+  const [rooms, setRooms] = useState(new Map())
+
+  const createdRoom = (rooms) => {
+    setRooms(rooms)
+  }
 
   const receiveChat = (messageList) => {
     setChat(messageList)
@@ -26,7 +32,8 @@ export const ConnectionProvider = ({ children }) => {
     setConnectionIsOpen,
     setOnlineUsers,
     updateOnlineUsers,
-    receiveChat
+    receiveChat,
+    createdRoom
   }
 
   useEffect(() => {
@@ -35,6 +42,7 @@ export const ConnectionProvider = ({ children }) => {
     }
     if (connectionIsOpen) {
       connection.getOnlineUsersList()
+      connection.getAvailableRooms()
     }
   }, [connection, connectionIsOpen])
 
@@ -42,7 +50,8 @@ export const ConnectionProvider = ({ children }) => {
     connection,
     connectionIsOpen,
     onlineUsers,
-    chat
+    chat,
+    rooms
   }
 
   return (

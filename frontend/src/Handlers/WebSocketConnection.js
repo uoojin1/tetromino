@@ -6,9 +6,10 @@ class WebSocketConnection {
     this.setConnectionIsOpen = methods.setConnectionIsOpen
     this.updateOnlineUsers = methods.updateOnlineUsers
     this.receiveChat = methods.receiveChat
+    this.createdRoom = methods.createdRoom
     this.onlineUsers = []
     this.chat = []
-    this.rooms = []
+    this.rooms = new Map()
     this._establishConnection()
 
     this.createRoom = this.createRoom.bind(this)
@@ -29,17 +30,19 @@ class WebSocketConnection {
       switch (method) {
         case 'new':
           this.setOnlineUsers(JSON.parse(value))
-        case 'getOnlineUsers':
+        case 'gotOnlineUsers':
           this.setOnlineUsers(JSON.parse(value))
           break
+        case 'gotAvailableRooms':
+          this.setRooms(new Map(JSON.parse(value)))
         case 'close':
           this.removeOnlineUser(JSON.parse(value))
           break
-        case 'chat':
+        case 'chatted':
           this.receivedChatFromServer(JSON.parse(value))
           break
         case 'createdRoom':
-          this.createdRoom(new Map(JSON.parse(value)))
+          this.setRooms(new Map(JSON.parse(value)))
         default:
           break
       }
@@ -53,8 +56,9 @@ class WebSocketConnection {
   //   return new Map(JSON.parse(jsonStr));
   // }
 
-  createdRoom(rooms) {
-    console.log('UI - createroom : rooms', rooms)
+  setRooms(rooms) {
+    this.rooms = rooms
+    this.createdRoom(this.rooms)
   }
 
   receivedChatFromServer(message) {
@@ -97,6 +101,10 @@ class WebSocketConnection {
 
   getOnlineUsersList() {
     this.ws.send(JSON.stringify('getOnlineUsers'))
+  }
+
+  getAvailableRooms() {
+    this.ws.send(JSON.stringify('getAvailableRooms'))
   }
 }
 

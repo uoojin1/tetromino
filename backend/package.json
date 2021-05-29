@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "braces": "^2.3.1",
-    "ws": "^7.1.2"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
